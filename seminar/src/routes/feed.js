@@ -9,7 +9,7 @@ class FeedDB {
         return FeedDB._inst_;
     }
 
-    #id = 1; #itemCount = 1; #LDataDB = [{ id: 0, title: "test1", content: "Example body" }];
+    #id = 0; #itemCount = 0; #LDataDB = [];
 
     constructor() { console.log("[Feed-DB] DB Init Completed"); }
 
@@ -20,6 +20,7 @@ class FeedDB {
     }
 
     insertItem = ( item ) => {
+      console.log(item);
         const { title, content } = item;
         this.#LDataDB.push({ id: this.#id, title, content });
         this.#id++; this.#itemCount++;
@@ -35,6 +36,21 @@ class FeedDB {
         });
         if (BItemDeleted) id--;
         return BItemDeleted;
+    }
+
+    editItem = ( item ) => {
+      const {id, title, content} = item;
+      let BItemEdited = false;
+      this.#LDataDB = this.#LDataDB.map(( value ) => {
+        if (value.id === id) {
+          BItemEdited = true;
+          return {id: id, title: title, content: content};
+        } else {
+          return value;
+        }
+      });
+      console.log(this.#LDataDB);
+      return BItemEdited;
     }
 }
 
@@ -71,6 +87,17 @@ router.post('/deleteFeed', (req, res) => {
     } catch (e) {
         return res.status(500).json({ error: e });
     }
-})
+});
+
+router.post('/editFeed', (req, res) => {
+  try {
+      const { id, title, content } = req.body;
+      const editResult = feedDBInst.editItem({id: parseInt(id), title, content});
+      if (!editResult) return res.status(500).json({ error: "No item edited" });
+      else return res.status(200).json({ isOK: true });
+  } catch (e) {
+      return res.status(500).json({ error: e });
+  }
+});
 
 module.exports = router;

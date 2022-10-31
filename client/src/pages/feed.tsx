@@ -3,6 +3,8 @@ import axios from "axios";
 import { SAPIBase } from "../tools/api";
 import Header from "../components/header";
 import "./css/feed.css";
+import { idText } from "typescript";
+import EditPost from "./edit_post";
 
 interface IAPIResponse  { id: number, title: string, content: string }
 
@@ -11,19 +13,19 @@ const FeedPage = (props: {}) => {
   const [ NPostCount, setNPostCount ] = React.useState<number>(0);
   const [ SNewPostTitle, setSNewPostTitle ] = React.useState<string>("");
   const [ SNewPostContent, setSNewPostContent ] = React.useState<string>("");
+  const [ Test, setTest ] = React.useState<boolean>(false);
 
   React.useEffect( () => {
     let BComponentExited = false;
     const asyncFun = async () => {
       const { data } = await axios.get<IAPIResponse[]>( SAPIBase + `/feed/getFeed?count=${ NPostCount }`);
       console.log(data);
-      // const data = [ { id: 0, title: "test1", content: "Example body" }, { id: 1, title: "test2", content: "Example body" }, { id: 2, title: "test3", content: "Example body" } ].slice(0, NPostCount);
       if (BComponentExited) return;
       setLAPIResponse(data);
     };
     asyncFun().catch((e) => window.alert(`Error while running API Call: ${e}`));
     return () => { BComponentExited = true; }
-  }, [ NPostCount ]);
+  }, [ NPostCount, Test ]);
 
   const createNewPost = () => {
     const asyncFun = async () => {
@@ -60,6 +62,7 @@ const FeedPage = (props: {}) => {
             <div className={"delete-item"} onClick={(e) => deletePost(`${val.id}`)}>ⓧ</div>
             <h3 className={"feed-title"}>{ val.title }</h3>
             <p className={"feed-body"}>{ val.content }</p>
+            <EditPost val={val} Test={Test} setTest={setTest} />
           </div>
         ) }
         <div className={"feed-item-add"}>
