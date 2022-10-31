@@ -22,6 +22,11 @@ class BankDB {
         this.#total += amount;
         return { success: true, data: this.#total };
     }
+
+    changePS = ( password ) => {
+      process.env.PASSWORD = password;
+      return true;
+    }
 }
 
 const bankDBInst = BankDB.getInst();
@@ -46,5 +51,17 @@ router.post('/transaction', authMiddleware, (req, res) => {
         return res.status(500).json({ error: e });
     }
 })
+
+router.post('/changeps', authMiddleware, (req, res) => {
+  try {
+    const { password } = req.body;
+    const ischanged = bankDBInst.changePS(password);
+    if(!ischanged) return res.status(500).json({error: ischanged});
+    else return res.status(200).json({ isOK: true });
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
+})
+
 
 module.exports = router;
