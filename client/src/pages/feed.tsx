@@ -3,7 +3,7 @@ import axios from "axios";
 import { SAPIBase } from "../tools/api";
 import Header from "../components/header";
 import "./css/feed.css";
-
+import UpdatePage from "./update_page";
 interface IAPIResponse  { _id: string, title: string, content: string }
 
 const FeedPage = (props: {}) => {
@@ -11,6 +11,7 @@ const FeedPage = (props: {}) => {
   const [ NPostCount, setNPostCount ] = React.useState<number>(0);
   const [ SNewPostTitle, setSNewPostTitle ] = React.useState<string>("");
   const [ SNewPostContent, setSNewPostContent ] = React.useState<string>("");
+  const [ UpdateKey, setUpdateKey ] = React.useState<boolean>(true);
 
   React.useEffect( () => {
     let BComponentExited = false;
@@ -23,7 +24,7 @@ const FeedPage = (props: {}) => {
     };
     asyncFun().catch((e) => window.alert(`Error while running API Call: ${e}`));
     return () => { BComponentExited = true; }
-  }, [ NPostCount ]);
+  }, [ NPostCount, UpdateKey ]);
 
   const createNewPost = () => {
     const asyncFun = async () => {
@@ -58,6 +59,7 @@ const FeedPage = (props: {}) => {
         { LAPIResponse.map( (val, i) =>
           <div key={i} className={"feed-item"}>
             <div className={"delete-item"} onClick={(e) => deletePost(`${val._id}`)}>ⓧ</div>
+            <UpdatePage id={val._id} UpdateKey={UpdateKey} setUpdateKey={setUpdateKey} />
             <h3 className={"feed-title"}>{ val.title }</h3>
             <p className={"feed-body"}>{ val.content }</p>
           </div>

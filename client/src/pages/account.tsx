@@ -11,26 +11,19 @@ const AccountPage = () => {
 
   const getAccountInformation = () => {
     const asyncFun = async() => {
-      interface IAPIResponse { balance: number };
-      const { data } = await axios.post<IAPIResponse>(SAPIBase + '/account/getInfo', { credential: SAPIKEY });
-      setNBalance(data.balance);
+      const { data } = await axios.post(SAPIBase + '/account/getInfo', { credential: SAPIKEY, name: SAPIKEY });
+      setNBalance(data.total);
     }
     asyncFun().catch((e) => window.alert(`AN ERROR OCCURED: ${e}`));
   }
 
   const performTransaction = ( amount: number | '' ) => {
-    const asyncFun = async() => {
+    const asyncFun = async () => {
       if (amount === '') return;
-      interface IAPIResponse { success: boolean, balance: number, msg: string };
-      const { data } = await axios.post<IAPIResponse>(SAPIBase + '/account/transaction', { credential: SAPIKEY, amount: amount });
+      const { data } = await axios.post(SAPIBase + '/account/transaction', { credential: SAPIKEY, amount: amount, name: SAPIKEY });
+      window.alert(`Transaction Success! ₩${ NBalance } -> ₩${ data.total }\nThank you for using SPARCS Bank`);
       setNTransaction(0);
-      if (!data.success) {
-        window.alert('Transaction Failed:' + data.msg);
-        return;
-      }
-      window.alert(`Transaction Success! ₩${ NBalance } -> ₩${ data.balance }\nThank you for using SPARCS Bank`);
-      setNTransaction(0);
-      setNBalance(data.balance);
+      setNBalance(data.total);
     }
     asyncFun().catch((e) => window.alert(`AN ERROR OCCURED: ${e}`));
   }
